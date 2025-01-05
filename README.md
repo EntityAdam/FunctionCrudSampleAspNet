@@ -13,7 +13,7 @@ This sample is using:
 - Cosmos Db emulator or CosmosDb instance  
 - Azurite Storage Emulator  
 
-# To start
+# To start local
 
 ## local.settings.json
 
@@ -54,7 +54,7 @@ Or you may set your connection string in `local.settings.json`
 ## Run
 In Visual Studio, use F5 or run to start the application with debugging.  
 
-Once the function host starts you will see the index of the functions  
+Once the function host starts you will see the index of the functions in the terminal
 
 ```sh
 Functions:
@@ -71,11 +71,11 @@ In the `Tests` folder I have created a `.http` file with a sample POST to create
 The `api/Create` endpoint will ensure the database named `example `and container named `documents` are created, as well as set the partition key to `/id` for the container.
 
 
-## ``api/GetAll` endpoint
+## `api/GetAll` endpoint
 
 The `api/GetAll` endpoint will retrieve all documents by using a SQL Query of `"SELECT * FROM c"`, and bind it to a `ReadOnlyList<T>` of a POCO named `MyDocument` which is a nested class under the Api class.
 
-## ``api/GetOne` endpoint
+## `api/GetOne` endpoint
 
 The `api/GetAll` endpoint will retrieve a single `MyDocument` with the Id of "1" (string) and PartitionKey of "1", demonstrating a _point query_. This will bind to the `MyDocument` POCO.
 
@@ -88,7 +88,7 @@ If you used the example `.http` file to create the document in the database, you
 }
 ```
 
-## ``api/GetOne404Error` endpoint
+## `api/GetOne404Error` endpoint
 
 This endpoint is intentionally broken to reproduce an error. Unless you create a CosmosDb document with the Id of "404". You will experience the following error.
 
