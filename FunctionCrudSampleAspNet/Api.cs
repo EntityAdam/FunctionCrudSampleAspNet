@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Cosmos.Serialization.HybridRow;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribute;
@@ -24,6 +25,47 @@ public class Api(ILogger<Api> logger)
         return Task.FromResult(response);
     }
 
+    [Function(nameof(GetAll))]
+    public async Task<IActionResult> GetAll(
+    [HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req,
+    [CosmosDBInput(cosmosDbName, cosmosContainerName, Connection = connectionString, SqlQuery = "SELECT * FROM c")] IReadOnlyList<MyDocument> myDocuments
+    )
+    {
+        _ = req;
+        return await Task.FromResult(new JsonResult(myDocuments));
+    }
+
+    [Function(nameof(GetOne))]
+    public async Task<IActionResult> GetOne(
+    [HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req,
+    [CosmosDBInput(cosmosDbName, cosmosContainerName, Connection = connectionString, Id = "1", PartitionKey = "1")] MyDocument myDocument
+    )
+    {
+        _ = req;
+        return await Task.FromResult(new JsonResult(myDocument));
+    }
+
+    [Function(nameof(GetOne404Error))]
+    public async Task<IActionResult> GetOne404Error(
+    [HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req,
+    [CosmosDBInput(cosmosDbName, cosmosContainerName, Connection = connectionString, Id = "404", PartitionKey = "404")] MyDocument myDocuments
+    )
+    {
+        JsonResult result;
+        try
+        {
+            _ = req;
+            result = new JsonResult(myDocuments);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError("Exception: {message}", ex.Message);
+            throw;
+        }
+        return await Task.FromResult(result);
+
+    }
+
     public class CreateResponse
     {
         [HttpResult]
@@ -35,7 +77,7 @@ public class Api(ILogger<Api> logger)
 
     public class MyDocument
     {
-        public string? id { get; set; }
-        public string? message { get; set; }
+        public string? Id { get; set; }
+        public string? Message { get; set; }
     }
 }
