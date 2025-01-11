@@ -21,4 +21,4 @@ builder.Services.Configure<WorkerOptions>(options =>
     });
 });
 
-await builder.Build().RunAsync();
+await builder.Build().RunAsync();       

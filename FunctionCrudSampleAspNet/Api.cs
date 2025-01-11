@@ -13,7 +13,9 @@ public class Api(ILogger<Api> logger)
     private const string connectionString = "CosmosDBConnection";
 
     [Function(nameof(CreateAsync))]
+    //<---------  NO AZFW0015 HERE WHEN HttpResultAttribute is commented out or not present -------->
     public Task<CreateAsyncResponse> CreateAsync(
+    //<---------  NO AZFW0015 HERE WHEN HttpResultAttribute is commented out or not present -------->
         [HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req,
         [FromBody] MyDocument myDocument
         )
@@ -67,8 +69,10 @@ public class Api(ILogger<Api> logger)
 
     public class CreateAsyncResponse
     {
+        //<---------  NO AZFW0015 HERE WHEN HttpResultAttribute is commented out or not present -------->
         //[HttpResult]
         public required IActionResult Response { get; set; }
+        //<---------  NO AZFW0015 HERE WHEN HttpResultAttribute is commented out or not present -------->
 
         [CosmosDBOutput(cosmosDbName, cosmosContainerName, Connection = connectionString, CreateIfNotExists = true, PartitionKey = "/id")]
         public MyDocument? Document { get; set; }
@@ -89,7 +93,9 @@ public class ApiSync(ILogger<ApiSync> logger)
 
 
     [Function(nameof(Create))]
+    //<---------  CORRECTLY WARNS AZFW0015 HERE WHEN HttpResultAttribute is commented out or not present -------->
     public CreateResponse Create(
+    //<---------  CORRECTLY WARNS AZFW0015 HERE WHEN HttpResultAttribute is commented out or not present -------->
         [HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req,
         [FromBody] MyDocument myDocument
         )
@@ -103,6 +109,7 @@ public class ApiSync(ILogger<ApiSync> logger)
 
     public class CreateResponse
     {
+        //<---------  CORRECTLY WARNS AZFW0015 HERE WHEN HttpResultAttribute is commented out or not present -------->
         //https://dotnet-worker-rules.azurewebsites.net/rules?ruleid=AZFW0015
         //[HttpResult]
         public required IActionResult Response { get; set; }
