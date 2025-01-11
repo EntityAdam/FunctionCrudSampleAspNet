@@ -12,15 +12,15 @@ public class Api(ILogger<Api> logger)
     private const string cosmosContainerName = "documents";
     private const string connectionString = "CosmosDBConnection";
 
-    [Function(nameof(Create))]
-    public Task<CreateResponse> Create(
+    [Function(nameof(CreateAsync))]
+    public Task<CreateAsyncResponse> CreateAsync(
         [HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req,
         [FromBody] MyDocument myDocument
         )
     {
         _ = req;
         logger.LogInformation("C# HTTP trigger function processed a request.");
-        CreateResponse response = new() { Response = new JsonResult(myDocument), Document = myDocument };
+        CreateAsyncResponse response = new() { Response = new JsonResult(myDocument), Document = myDocument };
         return Task.FromResult(response);
     }
 
@@ -65,9 +65,46 @@ public class Api(ILogger<Api> logger)
 
     }
 
+    public class CreateAsyncResponse
+    {
+        //[HttpResult]
+        public required IActionResult Response { get; set; }
+
+        [CosmosDBOutput(cosmosDbName, cosmosContainerName, Connection = connectionString, CreateIfNotExists = true, PartitionKey = "/id")]
+        public MyDocument? Document { get; set; }
+    }
+
+    public class MyDocument
+    {
+        public string? Id { get; set; }
+        public string? Message { get; set; }
+    }
+}
+
+public class ApiSync(ILogger<ApiSync> logger)
+{
+    private const string cosmosDbName = "example";
+    private const string cosmosContainerName = "documents";
+    private const string connectionString = "CosmosDBConnection";
+
+
+    [Function(nameof(Create))]
+    public CreateResponse Create(
+        [HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req,
+        [FromBody] MyDocument myDocument
+        )
+    {
+        _ = req;
+        logger.LogInformation("C# HTTP trigger function processed a request.");
+        CreateResponse response = new() { Response = new JsonResult(myDocument), Document = myDocument };
+        return response;
+    }
+
+
     public class CreateResponse
     {
-        [HttpResult]
+        //https://dotnet-worker-rules.azurewebsites.net/rules?ruleid=AZFW0015
+        //[HttpResult]
         public required IActionResult Response { get; set; }
 
         [CosmosDBOutput(cosmosDbName, cosmosContainerName, Connection = connectionString, CreateIfNotExists = true, PartitionKey = "/id")]
